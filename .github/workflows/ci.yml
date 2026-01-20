@@ -24,10 +24,18 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+      
+      - name: Analyze CodeQL
+        uses: github/codeql-action/analyze@v3
+
       - name: run tests
         run: npm test
 
       - name: Dependency vulnerability scan
         run: npm audit --audit-level=high
 
-      
+
