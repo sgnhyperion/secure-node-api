@@ -16,10 +16,10 @@ FROM node:23-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci --only=production
-
+# Copy only production dependencies from builder
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
+COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
 
