@@ -1,0 +1,22 @@
+name: CD Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: v1.30.0
+
+      - name: Dummy Kubernetes deploy
+        run: |
+          echo "Simulating Kubernetes deployment"
+          echo "kubectl apply -f k8s/deployment.yaml"
