@@ -37,11 +37,14 @@ jobs:
       - name: Analyze CodeQL
         uses: github/codeql-action/analyze@v4
 
-
       - name: run tests
         run: npm test
 
       - name: Dependency vulnerability scan
         run: npm audit --audit-level=high
+
+      - name: Build DOcker image
+        run: docker build -t secure-node-api .
+        
 
 
