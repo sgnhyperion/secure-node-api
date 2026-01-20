@@ -11,6 +11,9 @@ COPY . .
 # Run tests here (CI safety)
 RUN npm test
 
+# Remove devDependencies AFTER tests
+RUN npm prune --omit=dev
+
 # ---------- Stage 2: Production Runtime ----------
 FROM node:23-alpine
 
