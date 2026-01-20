@@ -1,4 +1,4 @@
-# ---------- Stage 1: Build & Test ----------
+# ---------- Builder (tests & verification only) ----------
 FROM node:23-alpine AS builder
 
 WORKDIR /app
@@ -7,20 +7,19 @@ COPY package*.json ./
 RUN npm ci
 
 COPY . .
+RUN npm test
 
-# Remove devDependencies AFTER tests
-RUN npm prune --omit=dev
-
-# ---------- Stage 2: Production Runtime ----------
+# ---------- Runtime (production only) ----------
 FROM node:23-alpine
 
 WORKDIR /app
 
-# Copy only production dependencies from builder
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/package.json ./package.json
+# Install ONLY production dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Copy application code only
+COPY src ./src
 
 EXPOSE 3000
-
 CMD ["node", "src/index.js"]
