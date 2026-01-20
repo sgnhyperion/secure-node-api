@@ -43,8 +43,15 @@ jobs:
       - name: Dependency vulnerability scan
         run: npm audit --audit-level=high
 
-      - name: Build DOcker image
+      - name: Build Docker image
         run: docker build -t secure-node-api .
-        
+
+      - name: scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: secure-node-api
+          severity: HIGH, CRITICAL
+          exit-code: 1
+
 
 
