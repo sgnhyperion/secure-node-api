@@ -10,7 +10,7 @@ jobs:
 
     permissions:
       contents: read
-      security-events: write
+      security-events: write 
 
     steps:
     # ----------------------------------------------------
