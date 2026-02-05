@@ -3,8 +3,8 @@ import express from "express";
 const app = express();
 
 app.get("/", (req, res) => {
-    res.json("Welcome to the secure node api");
-});
+    res.json("Welcome to the secure node api v1");
+}); 
 
 
 app.get("/health", (req, res) => {
