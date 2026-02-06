@@ -82,3 +82,7 @@ jobs:
       uses: zaproxy/action-baseline@v0.14.0
       with:
         target: ${{ env.TARGET_URL }}
+        docker_name: ghcr.io/zaproxy/zaproxy:stable
+        fail_action: false
+        allow_issue_writing: false   # 👈 THIS LINE FIXES IT
+        artifact_name: zap_scan
