@@ -7,16 +7,69 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    # ----------------------------------------------------
+    # 1. Checkout repository
+    # ----------------------------------------------------
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: v1.30.0
+    # ----------------------------------------------------
+    # 2. Configure AWS credentials
+    # ----------------------------------------------------
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
 
-      - name: Dummy Kubernetes deploy
-        run: |
-          echo "Simulating Kubernetes deployment"
-          echo "kubectl apply -f k8s/deployment.yaml"
+    # ----------------------------------------------------
+    # 3. Setup kubectl
+    # ----------------------------------------------------
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: v1.30.0
+
+    # ----------------------------------------------------
+    # 4. Update kubeconfig for EKS
+    # ----------------------------------------------------
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig \
+          --region us-west-2 \
+          --name secure-node-cluster
+
+    # ----------------------------------------------------
+    # 5. Deploy application to EKS
+    # ----------------------------------------------------
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+
+    # ----------------------------------------------------
+    # 6. Wait for rollout
+    # ----------------------------------------------------
+    - name: Wait for deployment rollout
+      run: |
+        kubectl rollout status deployment/secure-node-api
+
+    # ----------------------------------------------------
+    # 7. Get Service External IP
+    # ----------------------------------------------------
+    - name: Get service external IP
+      run: |
+        kubectl get svc secure-node-api-service
+
+    # ----------------------------------------------------
+    # 8. DAST – OWASP ZAP (Baseline)
+    # ----------------------------------------------------
+    - name: Run OWASP ZAP DAST Scan
+      uses: zaproxy/action-baseline@v0.14.0
+      with:
+        target: http://$(kubectl get svc secure-node-api-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
