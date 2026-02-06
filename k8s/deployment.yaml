@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: secure-node-api
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: secure-node-api

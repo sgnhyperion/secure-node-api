@@ -64,24 +64,33 @@ jobs:
     - name: Run Tests
       run: npm test
 
-    # ----------------------------------------------------
-    # 8. Docker Build
-    # ----------------------------------------------------
-    - name: Build Docker image
-      run: docker build -t secure-node-api .
+     # 8. Login to DockerHub
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # ----------------------------------------------------
-    # 9. Trivy Image Scan
+    # 9. Docker Build
+    # ----------------------------------------------------
+    - name: Build and Push Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/secure-node-api:latest .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/secure-node-api:latest
+
+    # ----------------------------------------------------
+    # 10. Trivy Image Scan
     # ----------------------------------------------------
     - name: Trivy Scan
       uses: aquasecurity/trivy-action@0.24.0
       with:
-        image-ref: secure-node-api
+        image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/secure-node-api:latest
         severity: CRITICAL,HIGH
         exit-code: 0
 
     # ----------------------------------------------------
-    # 10. Container Smoke Test
+    # 11. Container Smoke Test
     # ----------------------------------------------------
     - name: Run container and test
       run: |
