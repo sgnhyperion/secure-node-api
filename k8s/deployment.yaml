@@ -13,7 +13,7 @@ spec:
         app: secure-node-api
     spec:
       containers:
-      - name: app
-        image: shadoww717/secure-node-api:latest
-        ports:
-        - containerPort: 3000
+        - name: app
+          image: shadoww717/secure-node-api:latest
+          ports:
+            - containerPort: 3000
