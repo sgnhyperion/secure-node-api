@@ -3,13 +3,13 @@ name: CD Pipeline
 on:
   workflow_dispatch:
 
+permissions:
+      contents: read
+      issues: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      issues: write
 
     steps:
     # ----------------------------------------------------
