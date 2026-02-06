@@ -58,17 +58,15 @@ jobs:
     # ----------------------------------------------------
     # 5. Deploy application to EKS
     # ----------------------------------------------------
-    - name: Deploy to Kubernetes
+    - name: Deploy new image
       run: |
-        kubectl apply -f k8s/deployment.yaml
-        kubectl apply -f k8s/service.yaml
+        kubectl set image deployment/secure-node-api \
+          app=shadoww717/secure-node-api:${{ github.sha }}
 
-    # ----------------------------------------------------
-    # 6. Wait for rollout
-    # ----------------------------------------------------
-    - name: Wait for deployment rollout
+    - name: Wait for rollout
       run: |
         kubectl rollout status deployment/secure-node-api
+
 
     # ----------------------------------------------------
     # 7. Get Service External IP
@@ -77,13 +75,6 @@ jobs:
       run: |
         kubectl get svc secure-node-api-service
 
-    # Get service URL
-    - name: Get Service URL
-      run: |
-        URL=$(kubectl get svc secure-node-api-service \
-          -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-        echo "TARGET_URL=http://$URL" >> $GITHUB_ENV
-
 
     # ----------------------------------------------------
     # 8. DAST – OWASP ZAP (Baseline)
@@ -91,7 +82,7 @@ jobs:
     - name: Run OWASP ZAP DAST Scan
       uses: zaproxy/action-baseline@v0.14.0
       with:
-        target: ${{ secrets.TARGET_URL }}
+        target: http://aa2980a90178a48f68aa180d865c3f0f-412108368.us-west-2.elb.amazonaws.com/
         fail_action: false
         allow_issue_writing: false
         artifact_name: zap_scan
