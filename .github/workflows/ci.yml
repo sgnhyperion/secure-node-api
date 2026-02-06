@@ -74,10 +74,14 @@ jobs:
     # ----------------------------------------------------
     # 9. Docker Build
     # ----------------------------------------------------
-    - name: Build and Push Docker image
+    - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/secure-node-api:latest .
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/secure-node-api:latest
+        docker build -t shadoww717/secure-node-api:${{ github.sha }} .
+
+    - name: Push Docker image
+      run: |
+        docker push shadoww717/secure-node-api:${{ github.sha }}
+
 
     # ----------------------------------------------------
     # 10. Trivy Image Scan
