@@ -94,7 +94,7 @@ jobs:
     # ----------------------------------------------------
     - name: Run container and test
       run: |
-        docker run -d -p 3000:3000 --name app secure-node-api
+        docker run -d -p 3000:3000 --name app ${{ secrets.DOCKERHUB_USERNAME }}/secure-node-api
         sleep 5
         curl -f http://localhost:3000/health
         docker rm -f app
